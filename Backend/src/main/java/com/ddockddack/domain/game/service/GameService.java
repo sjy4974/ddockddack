@@ -51,7 +51,6 @@ public class GameService {
     private final MemberRepository memberRepository;
     private final StarredGameRepository starredGameRepository;
     private final ReportedGameRepository reportedGameRepository;
-    private final GameRepositorySupport gameRepositorySupport;
     private final AwsS3 awsS3;
 
     /**
@@ -64,7 +63,7 @@ public class GameService {
     @Transactional(readOnly = true)
     public PageImpl<GameRes> findAllGames(Long memberId, PageConditionReq pageConditionReq) {
         PageCondition pageCondition = pageConditionReq.toEntity();
-        return gameRepositorySupport.findAllGameBySearch(memberId, pageCondition);
+        return gameRepository.findAllBySearch(memberId, pageCondition);
     }
 
     /**
@@ -75,7 +74,7 @@ public class GameService {
      */
     @Transactional(readOnly = true)
     public GameDetailRes findGame(Long gameId) {
-        List<GameDetailRes> result = gameRepositorySupport.findGame(gameId);
+        List<GameDetailRes> result = gameRepository.findGame(gameId);
         if (result.size() == 0) {
             throw new NotFoundException(ErrorCode.GAME_NOT_FOUND);
         }
@@ -274,7 +273,7 @@ public class GameService {
         PageCondition pageCondition = pageConditionReq.toEntity();
         memberRepository.findById(memberId).orElseThrow(() ->
                 new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
-        return gameRepositorySupport.findAllByMemberId(memberId, pageCondition);
+        return gameRepository.findAllByMemberId(memberId, pageCondition);
     }
 
     /**
@@ -287,7 +286,7 @@ public class GameService {
     public List<StarredGameRes> findAllStarredGames(Long memberId) {
         memberRepository.findById(memberId).orElseThrow(() ->
                 new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
-        return gameRepositorySupport.findAllStarredGame(memberId);
+        return gameRepository.findAllStarredGame(memberId);
     }
 
     /**
@@ -298,7 +297,7 @@ public class GameService {
     @Transactional(readOnly = true)
     public List<ReportedGameRes> findAllReportedGames() {
 
-        return gameRepositorySupport.findAllReportedGame();
+        return gameRepository.findAllReportedGame();
     }
 
     /**
@@ -359,7 +358,6 @@ public class GameService {
                 new File(absolutePath + path + File.separator + list.get(i)).delete();
             }
         }
-
     }
 
     /**

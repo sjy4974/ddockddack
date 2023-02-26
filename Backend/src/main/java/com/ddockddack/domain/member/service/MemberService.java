@@ -125,7 +125,7 @@ public class MemberService {
         bestcutService.removeByMemberId(memberId);
         bestcutService.removeAllByIds(bestcutIds);
 
-        List<Long> gameIds = gameRepositorySupport.findAllGameIdByMemberId(memberId);
+        List<Long> gameIds = gameRepositorySupport.findGameIdsByMemberId(memberId);
         gameImageRepository.deleteAllByGameId(gameIds);
         starredGameRepository.deleteByMemberId(memberId);
         starredGameRepository.deleteAllByGameId(gameIds);
