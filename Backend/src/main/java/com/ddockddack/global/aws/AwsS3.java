@@ -20,7 +20,7 @@ import java.util.UUID;
 
 @Service
 @NoArgsConstructor
-public class AwsS3Service {
+public class AwsS3 {
 
     private AmazonS3 s3Client;
 

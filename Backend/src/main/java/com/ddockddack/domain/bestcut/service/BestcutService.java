@@ -19,7 +19,7 @@ import com.ddockddack.global.error.ErrorCode;
 import com.ddockddack.global.error.exception.AccessDeniedException;
 import com.ddockddack.global.error.exception.AlreadyExistResourceException;
 import com.ddockddack.global.error.exception.NotFoundException;
-import com.ddockddack.global.aws.AwsS3Service;
+import com.ddockddack.global.aws.AwsS3;
 import com.ddockddack.global.util.PageCondition;
 import com.ddockddack.global.util.PageConditionReq;
 import lombok.RequiredArgsConstructor;
@@ -39,7 +39,7 @@ public class BestcutService {
     private final ReportedBestcutRepository reportedBestcutRepository;
     private final MemberRepository memberRepository;
     private final GameRoomRepository gameRoomRepository;
-    private final AwsS3Service awsS3Service;
+    private final AwsS3 awsS3;
     private final BestcutRepositorySupport bestcutRepositorySupport;
 
 
@@ -62,7 +62,7 @@ public class BestcutService {
             int index = imageReq.getBestcutIndex();
 
             byte[] byteImage = gameRoomRepository.findByImageIndex(pinNumber, socketId, index);
-            String fileName = awsS3Service.InputStreamUpload(byteImage);
+            String fileName = awsS3.InputStreamUpload(byteImage);
 
             Bestcut bestcut = Bestcut.builder()
                     .member(member)
@@ -99,7 +99,7 @@ public class BestcutService {
         bestcutLikeRepository.deleteByBestcutId(bestcutId);
         reportedBestcutRepository.deleteByBestcutId(bestcutId);
 
-        awsS3Service.deleteObject(bestcut.getImageUrl());
+        awsS3.deleteObject(bestcut.getImageUrl());
         bestcutRepository.delete(bestcut);
     }
 

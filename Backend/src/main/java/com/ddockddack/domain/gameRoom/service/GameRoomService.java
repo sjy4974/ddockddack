@@ -15,7 +15,7 @@ import com.ddockddack.domain.similarity.service.EnsembleModel;
 import com.ddockddack.global.error.ErrorCode;
 import com.ddockddack.global.error.exception.AccessDeniedException;
 import com.ddockddack.global.error.exception.NotFoundException;
-import com.ddockddack.global.aws.AwsS3Service;
+import com.ddockddack.global.aws.AwsS3;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.openvidu.java.client.OpenViduHttpException;
 import io.openvidu.java.client.OpenViduJavaClientException;
@@ -36,7 +36,7 @@ public class GameRoomService {
     private final GameRepository gameRepository;
     private final MemberRepository memberRepository;
     private final GameRoomHistoryRepository gameRoomHistoryRepository;
-    private final AwsS3Service awsS3Service;
+    private final AwsS3 awsS3;
     private final EnsembleModel ensembleModel;
 
 
@@ -179,7 +179,7 @@ public class GameRoomService {
             throws Exception {
         gameRoomRepository.findById(pinNumber).orElseThrow(() ->
                 new NotFoundException(ErrorCode.GAME_ROOM_NOT_FOUND));
-        byte[] byteGameImage = awsS3Service.getObject(param.get("gameImage"));
+        byte[] byteGameImage = awsS3.getObject(param.get("gameImage"));
         byte[] byteImage = Base64.decodeBase64(param.get("memberGameImage"));
         int rawScore = ensembleModel.CalculateSimilarity(byteGameImage, byteImage);
         gameRoomRepository.saveScore(pinNumber, sessionId, byteImage, rawScore);

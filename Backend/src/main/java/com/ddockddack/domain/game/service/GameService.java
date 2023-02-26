@@ -26,7 +26,7 @@ import com.ddockddack.global.error.exception.AccessDeniedException;
 import com.ddockddack.global.error.exception.AlreadyExistResourceException;
 import com.ddockddack.global.error.exception.ImageExtensionException;
 import com.ddockddack.global.error.exception.NotFoundException;
-import com.ddockddack.global.aws.AwsS3Service;
+import com.ddockddack.global.aws.AwsS3;
 import com.ddockddack.global.util.PageCondition;
 import com.ddockddack.global.util.PageConditionReq;
 import lombok.RequiredArgsConstructor;
@@ -52,7 +52,7 @@ public class GameService {
     private final StarredGameRepository starredGameRepository;
     private final ReportedGameRepository reportedGameRepository;
     private final GameRepositorySupport gameRepositorySupport;
-    private final AwsS3Service awsS3Service;
+    private final AwsS3 awsS3;
 
     /**
      * 게임 목록 조회
@@ -119,7 +119,7 @@ public class GameService {
                 throw new ImageExtensionException(ErrorCode.EXTENSION_NOT_ALLOWED);
             }
             // 파일 업로드
-            String fileName = awsS3Service.multipartFileUpload(gameImageParam.getGameImage());
+            String fileName = awsS3.multipartFileUpload(gameImageParam.getGameImage());
 
             GameImage gameImage = GameImage.builder()
                     .game(game)
@@ -162,7 +162,7 @@ public class GameService {
             if (!contentType.contains("image/jpeg")) {
                 throw new ImageExtensionException(ErrorCode.EXTENSION_NOT_ALLOWED);
             }
-            String fileName = awsS3Service.multipartFileUpload(gameImageModifyReq.getGameImage());
+            String fileName = awsS3.multipartFileUpload(gameImageModifyReq.getGameImage());
 
             // 업데이트
             getGameImage.updateGameImage(fileName, gameImageModifyReq.getGameImageDesc());

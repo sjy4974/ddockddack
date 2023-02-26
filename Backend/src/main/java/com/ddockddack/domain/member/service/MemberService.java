@@ -15,7 +15,7 @@ import com.ddockddack.domain.report.repository.ReportedGameRepository;
 import com.ddockddack.global.error.ErrorCode;
 import com.ddockddack.global.error.exception.ImageExtensionException;
 import com.ddockddack.global.error.exception.NotFoundException;
-import com.ddockddack.global.aws.AwsS3Service;
+import com.ddockddack.global.aws.AwsS3;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -44,7 +44,7 @@ public class MemberService {
     private final GameRepository gameRepository;
     private final GameRoomHistoryRepository gameRoomHistoryRepository;
     private final GameRoomHistoryRepositorySupport gameRoomHistoryRepositorySupport;
-    private final AwsS3Service awsS3Service;
+    private final AwsS3 awsS3;
 
 
     //    private final RedisTemplate redisTemplate;
@@ -94,9 +94,9 @@ public class MemberService {
         log.info("modifyProfileImg contentType {}", modifyProfileImg.getContentType());
 
         try {
-            String fileName = awsS3Service.multipartFileUpload(modifyProfileImg);
+            String fileName = awsS3.multipartFileUpload(modifyProfileImg);
             if (!member.getProfile().equals("default_profile_img.png")) {
-                awsS3Service.deleteObject(member.getProfile());
+                awsS3.deleteObject(member.getProfile());
             }
             member.modifyProfile(fileName);
 
