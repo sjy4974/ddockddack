@@ -140,17 +140,6 @@ public class GameRoomApiController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("{pinNumber}/result/{round}")
-    @Operation(summary = "게임 라운드 결과 반환")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "라운드 결과 반환 성공")
-    })
-    public ResponseEntity<List<GameMemberRes>> getResult(@PathVariable("pinNumber") String pinNumber,
-                                                         @PathVariable("round") int round) {
-
-        return ResponseEntity.ok(gameRoomService.findRoundResult(pinNumber, round));
-    }
-
     @GetMapping("{pinNumber}/round")
     @Operation(summary = "다음 라운드로 진행")
     public ResponseEntity next(@PathVariable("pinNumber") String pinNumber) throws JsonProcessingException {

@@ -189,29 +189,6 @@ public class GameRoomService {
     }
 
     /**
-     * 라운드 결과 조회
-     *
-     * @param pinNumber
-     * @param round
-     * @return
-     */
-    public List<GameMemberRes> findRoundResult(String pinNumber, int round) {
-        Map<String, GameMember> gameMembers = gameRoomRepository.findGameMembers(pinNumber);
-        List<GameMember> members = new ArrayList<>(gameMembers.values());
-        PriorityQueue<GameMember> pq = new PriorityQueue<>(
-                (a, b) -> b.getRoundScore() - a.getRoundScore());
-        pq.addAll(members);
-        List<GameMemberRes> result = new ArrayList<>();
-        for (int i = 0; i < 3; i++) {
-            if (pq.isEmpty()) {
-                break;
-            }
-            result.add(GameMemberRes.from(pq.poll(), round));
-        }
-        return result;
-    }
-
-    /**
      * 게임 이력 전체 조회
      *
      * @param memberId

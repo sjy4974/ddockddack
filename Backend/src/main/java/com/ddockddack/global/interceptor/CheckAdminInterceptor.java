@@ -43,7 +43,6 @@ public class CheckAdminInterceptor implements HandlerInterceptor {
             if(adminService.isAdminByAccessToken(adminId)){
                 return HandlerInterceptor.super.preHandle(request, response, handler);
             }
-
         }
 
         throw new NotFoundException(ErrorCode.NOT_ADMIN);

@@ -23,7 +23,6 @@ import org.hibernate.annotations.DynamicInsert;
 @DynamicInsert
 public class Bestcut {
 
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "bestcut_id")

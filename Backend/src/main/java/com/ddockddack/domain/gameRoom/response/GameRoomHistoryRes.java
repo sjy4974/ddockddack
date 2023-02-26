@@ -32,7 +32,7 @@ public class GameRoomHistoryRes {
             .builder()
             .gameTitle(gameRoomHistory.getGameTitle())
             .ranking(gameRoomHistory.getRanking())
-            .playedTime(gameRoomHistory.getCreateAt())
+            .playedTime(gameRoomHistory.getCreatedAt())
             .build();
     }
 

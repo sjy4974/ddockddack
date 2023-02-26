@@ -21,6 +21,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PostConstruct;
@@ -52,6 +53,13 @@ public class GameRoomRepository {
         log.info("OPENVIDU_URL" + OPENVIDU_URL);
     }
 
+    /**
+     * 방 생성
+     * @param game
+     * @return
+     * @throws OpenViduJavaClientException
+     * @throws OpenViduHttpException
+     */
     public String create(Game game) throws OpenViduJavaClientException, OpenViduHttpException {
         //핀 넘버 생성
         String pinNumber = createPinNumber();
@@ -79,6 +87,16 @@ public class GameRoomRepository {
         return pinNumber;
     }
 
+    /**
+     * 방 참가
+     * @param pinNumber
+     * @param member
+     * @param nickname
+     * @param clientIp
+     * @return
+     * @throws OpenViduJavaClientException
+     * @throws OpenViduHttpException
+     */
     public String join(String pinNumber, Member member, String nickname, String clientIp)
             throws OpenViduJavaClientException, OpenViduHttpException {
         //존재하는 pin인지 확인
@@ -102,10 +120,19 @@ public class GameRoomRepository {
         return connection.getToken();
     }
 
+    /**
+     * 세션 조회
+     * @param pinNumber
+     * @return
+     */
     public Optional<Session> findSessionByPinNumber(String pinNumber) {
         return Optional.ofNullable(openvidu.getActiveSession(pinNumber));
     }
 
+    /**
+     * 핀 넘버 생성
+     * @return
+     */
     public String createPinNumber() {
         String pin = intToPin(random.nextInt(PIN_NUMBER_BOUND));
         while (gameRooms.containsKey(pin)) {
@@ -114,22 +141,46 @@ public class GameRoomRepository {
         return pin;
     }
 
+    /**
+     * 문자열 핀 넘버를 숫자로 변환
+     * @param num
+     * @return
+     */
     public String intToPin(int num) {
         return String.format("%06d", num);
     }
 
+    /**
+     * 게임 멤버 삭제
+     * @param pinNumber
+     * @param sessionId
+     */
     public void deleteGameMember(String pinNumber, String sessionId) {
         gameRooms.get(pinNumber).getMembers().remove(sessionId);
     }
 
+    /**
+     * 세션 삭제
+     * @param pinNumber
+     */
     public void deleteById(String pinNumber) {
         gameRooms.remove(pinNumber);
     }
 
+    /**
+     * 게임 방 조회
+     * @param pinNumber
+     * @return
+     */
     public Optional<GameRoom> findById(String pinNumber) {
         return Optional.ofNullable(gameRooms.get(pinNumber));
     }
 
+    /**
+     * 게임 시작
+     * @param pinNumber
+     * @throws JsonProcessingException
+     */
     public void updateGameRoom(String pinNumber) throws JsonProcessingException {
         GameRoom gameRoom = this.gameRooms.get(pinNumber);
         gameRoom.start();
@@ -138,6 +189,11 @@ public class GameRoomRepository {
         sendSignal(signal);
     }
 
+    /**
+     * 다음 라운드
+     * @param pinNumber
+     * @throws JsonProcessingException
+     */
     public void nextRound(String pinNumber) throws JsonProcessingException {
         GameRoom gameRoom = this.gameRooms.get(pinNumber);
 
@@ -145,6 +201,14 @@ public class GameRoomRepository {
         sendSignal(signal);
     }
 
+    /**
+     * 게임 점수 저장
+     * @param pinNumber
+     * @param sessionId
+     * @param byteImage
+     * @param rawScore
+     * @throws JsonProcessingException
+     */
     public void saveScore(String pinNumber, String sessionId, byte[] byteImage, int rawScore)
             throws JsonProcessingException {
         GameRoom gameRoom = this.gameRooms.get(pinNumber);
@@ -156,8 +220,6 @@ public class GameRoomRepository {
         if (gameRoom.getScoreCount() == gameRoom.getMembers().size()) {
             List<GameMemberRes> roundResultData = findRoundResult(gameRoom);
             int maxRoundScore = Collections.max(roundResultData, Comparator.comparing(GameMemberRes::getRoundScore)).getRoundScore();
-//            iterate every gameMember in the GameRoom and calculate scaledRoundScore and totalScore
-//            members is Map(String, GameMember)
             for (GameMember member : gameRoom.getMembers().values()) {
                 int scaledRoundScore = (int) (((double) member.getRoundScore() / maxRoundScore) * 100); //max score per round is +100 point
                 member.setScaledRoundScore(scaledRoundScore);
@@ -173,6 +235,11 @@ public class GameRoomRepository {
         }
     }
 
+    /**
+     * 최종 결과 반환
+     * @param pinNumber
+     * @throws JsonProcessingException
+     */
     public void finalResult(String pinNumber) throws JsonProcessingException {
         GameRoom gameRoom = this.gameRooms.get(pinNumber);
         String resultData = mapper.writeValueAsString(findFinalResult(gameRoom));
@@ -182,6 +249,14 @@ public class GameRoomRepository {
     }
 
 
+    /**
+     * 시그널 셍성
+     * @param pinNumber
+     * @param signalName
+     * @param data
+     * @return
+     * @throws JsonProcessingException
+     */
     private String createSignal(String pinNumber, String signalName, String data) throws JsonProcessingException {
         GameSignalReq req = GameSignalReq.builder()
                 .session(pinNumber)
@@ -193,6 +268,10 @@ public class GameRoomRepository {
         return stringReq;
     }
 
+    /**
+     * 시그널 보내기
+     * @param signal
+     */
     private void sendSignal(String signal) {
         RestTemplate restTemplate = new RestTemplate();
 
@@ -208,15 +287,23 @@ public class GameRoomRepository {
     }
 
 
+    /**
+     * 게임 유저의 이미지 조회
+     * @param pinNumber
+     * @param sessionId
+     * @param index
+     * @return
+     */
     public byte[] findByImageIndex(String pinNumber, String sessionId, int index) {
         GameMember gameMember = gameRooms.get(pinNumber).getMembers().get(sessionId);
         return gameMember.getImages().get(index);
     }
 
-    public Map<String, GameMember> findGameMembers(String pinNumber) {
-        return gameRooms.get(pinNumber).getMembers();
-    }
-
+    /**
+     * 라운드 결과 반환
+     * @param gameRoom
+     * @return
+     */
     public List<GameMemberRes> findRoundResult(GameRoom gameRoom) {
         List<GameMember> members = new ArrayList<>(gameRoom.getMembers().values());
         PriorityQueue<GameMember> pq = new PriorityQueue<>((a, b) -> b.getRoundScore() - a.getRoundScore());
@@ -229,14 +316,18 @@ public class GameRoomRepository {
         return result;
     }
 
-
+    /**
+     * 최종 결과 반환 후 게임 이력 저장
+     * @param gameRoom
+     * @return
+     */
+    @Transactional
     public List<GameMemberRes> findFinalResult(GameRoom gameRoom) {
         List<GameMember> members = new ArrayList<>(gameRoom.getMembers().values());
         PriorityQueue<GameMember> pq = new PriorityQueue<>((a, b) -> b.getTotalScore() - a.getTotalScore());
         pq.addAll(members);
         List<GameMemberRes> finalResult = new ArrayList<>();
         List<GameRoomHistory> historyList = new ArrayList<>();
-
         int ranking = 1;
         while (!pq.isEmpty()) {
             GameMember gameMember = pq.poll();

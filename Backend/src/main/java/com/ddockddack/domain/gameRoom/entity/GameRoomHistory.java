@@ -36,7 +36,7 @@ public class GameRoomHistory {
     private int ranking;
 
     @Column(columnDefinition = "DATE default (current_date)")
-    private LocalDate createAt;
+    private LocalDate createdAt;
 
     @Builder
     public GameRoomHistory(Long memberId, String gameTitle, int ranking) {
