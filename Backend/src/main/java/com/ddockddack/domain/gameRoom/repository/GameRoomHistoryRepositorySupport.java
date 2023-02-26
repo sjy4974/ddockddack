@@ -14,7 +14,6 @@ public class GameRoomHistoryRepositorySupport {
 
     private final JPAQueryFactory jpaQueryFactory;
 
-    // 게임 이력 삭제
     public List<Long> findAllGameRoomHistoryIdByMemberId(Long memberId) {
         return jpaQueryFactory
             .select(gameRoomHistory.id

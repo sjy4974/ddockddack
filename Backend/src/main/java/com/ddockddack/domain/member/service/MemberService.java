@@ -15,7 +15,7 @@ import com.ddockddack.domain.report.repository.ReportedGameRepository;
 import com.ddockddack.global.error.ErrorCode;
 import com.ddockddack.global.error.exception.ImageExtensionException;
 import com.ddockddack.global.error.exception.NotFoundException;
-import com.ddockddack.global.service.AwsS3Service;
+import com.ddockddack.global.aws.AwsS3Service;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;

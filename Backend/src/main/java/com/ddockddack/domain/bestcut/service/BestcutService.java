@@ -19,7 +19,7 @@ import com.ddockddack.global.error.ErrorCode;
 import com.ddockddack.global.error.exception.AccessDeniedException;
 import com.ddockddack.global.error.exception.AlreadyExistResourceException;
 import com.ddockddack.global.error.exception.NotFoundException;
-import com.ddockddack.global.service.AwsS3Service;
+import com.ddockddack.global.aws.AwsS3Service;
 import com.ddockddack.global.util.PageCondition;
 import com.ddockddack.global.util.PageConditionReq;
 import lombok.RequiredArgsConstructor;

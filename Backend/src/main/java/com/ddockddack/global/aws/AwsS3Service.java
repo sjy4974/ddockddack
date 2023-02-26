@@ -1,4 +1,4 @@
-package com.ddockddack.global.service;
+package com.ddockddack.global.aws;
 
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;

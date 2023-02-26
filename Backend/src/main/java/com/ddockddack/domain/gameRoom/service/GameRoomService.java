@@ -7,7 +7,6 @@ import com.ddockddack.domain.gameRoom.repository.GameMember;
 import com.ddockddack.domain.gameRoom.repository.GameRoom;
 import com.ddockddack.domain.gameRoom.repository.GameRoomHistoryRepository;
 import com.ddockddack.domain.gameRoom.repository.GameRoomRepository;
-import com.ddockddack.domain.gameRoom.response.GameMemberRes;
 import com.ddockddack.domain.gameRoom.response.GameRoomHistoryRes;
 import com.ddockddack.domain.gameRoom.response.GameRoomRes;
 import com.ddockddack.domain.member.entity.Member;
@@ -16,7 +15,7 @@ import com.ddockddack.domain.similarity.service.EnsembleModel;
 import com.ddockddack.global.error.ErrorCode;
 import com.ddockddack.global.error.exception.AccessDeniedException;
 import com.ddockddack.global.error.exception.NotFoundException;
-import com.ddockddack.global.service.AwsS3Service;
+import com.ddockddack.global.aws.AwsS3Service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.openvidu.java.client.OpenViduHttpException;
 import io.openvidu.java.client.OpenViduJavaClientException;
@@ -25,10 +24,8 @@ import org.apache.commons.codec.binary.Base64;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.PriorityQueue;
 import java.util.stream.Collectors;
 
 @Service
