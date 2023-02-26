@@ -1,5 +1,6 @@
 package com.ddockddack.domain.member.entity;
 
+import com.ddockddack.global.util.BaseEntity;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 
@@ -11,7 +12,7 @@ import java.time.LocalDate;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(uniqueConstraints = { @UniqueConstraint(columnNames = { "email" })})
 // 이따가 테이블에 유니크 제약조건 추가
-public class Member {
+public class Member extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "member_id")

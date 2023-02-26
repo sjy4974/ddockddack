@@ -40,7 +40,6 @@ public class MemberService {
     private final ReportedGameRepository reportedGameRepository;
     private final GameImageRepository gameImageRepository;
     private final StarredGameRepository starredGameRepository;
-    private final GameRepositorySupport gameRepositorySupport;
     private final GameRepository gameRepository;
     private final GameRoomHistoryRepository gameRoomHistoryRepository;
     private final GameRoomHistoryRepositorySupport gameRoomHistoryRepositorySupport;
@@ -125,7 +124,7 @@ public class MemberService {
         bestcutService.removeByMemberId(memberId);
         bestcutService.removeAllByIds(bestcutIds);
 
-        List<Long> gameIds = gameRepositorySupport.findGameIdsByMemberId(memberId);
+        List<Long> gameIds = gameRepository.findGameIdsByMemberId(memberId);
         gameImageRepository.deleteAllByGameId(gameIds);
         starredGameRepository.deleteByMemberId(memberId);
         starredGameRepository.deleteAllByGameId(gameIds);
