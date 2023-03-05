@@ -210,7 +210,7 @@ public class MemberApiController {
         @ModelAttribute PageConditionReq pageConditionReq, Authentication authentication) {
         Long memberId = ((MemberAccessRes)authentication.getPrincipal()).getId();
         try {
-            PageImpl<GameRes> gameResList = gameService.findAllGameByMemberId(memberId, pageConditionReq);
+            PageImpl<GameRes> gameResList = gameService.findAllGamesByMemberId(memberId, pageConditionReq);
             return ResponseEntity.ok(gameResList);
         } catch (Exception e) {
             return ResponseEntity.status(500).body(e);
