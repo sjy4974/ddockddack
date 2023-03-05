@@ -1,6 +1,7 @@
 package com.ddockddack.domain.gameRoom.entity;
 
 import com.ddockddack.domain.gameRoom.request.GameRoomHistoryReq;
+import com.ddockddack.global.util.BaseEntity;
 import java.time.LocalDate;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -19,7 +20,7 @@ import org.hibernate.annotations.DynamicInsert;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @DynamicInsert
-public class GameRoomHistory {
+public class GameRoomHistory extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,9 +35,6 @@ public class GameRoomHistory {
 
     @Column(nullable = false)
     private int ranking;
-
-    @Column(columnDefinition = "DATE default (current_date)")
-    private LocalDate createdAt;
 
     @Builder
     public GameRoomHistory(Long memberId, String gameTitle, int ranking) {
