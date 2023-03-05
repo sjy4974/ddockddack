@@ -16,9 +16,7 @@ import com.ddockddack.domain.game.response.QGameDetailRes;
 import com.ddockddack.domain.game.response.QGameImageRes;
 import com.ddockddack.domain.game.response.QGameRes;
 import com.ddockddack.domain.game.response.QReportedGameRes;
-import com.ddockddack.domain.game.response.QStarredGameRes;
 import com.ddockddack.domain.game.response.ReportedGameRes;
-import com.ddockddack.domain.game.response.StarredGameRes;
 import com.ddockddack.global.util.PageCondition;
 import com.ddockddack.global.util.PeriodCondition;
 import com.ddockddack.global.util.SearchCondition;
@@ -129,60 +127,6 @@ public class GameRepositoryImpl implements GameRepositorySupport {
             getTotalPageCount(memberId, pageCondition));
     }
 
-    // 즐겨찾기 한 게임 목록 조회
-    @Override
-    public List<StarredGameRes> findAllStarredGame(Long memberId) {
-        return jpaQueryFactory
-            .select(new QStarredGameRes(
-                starredGame.game.id.as("gameId"),
-                starredGame.game.category.as("gameCategory").stringValue(),
-                starredGame.game.title.as("gameTitle"),
-                starredGame.game.description.as("gameDesc"),
-                starredGame.game.member.nickname.as("creator"),
-                isStarred(memberId),
-                getStarredCnt(),
-                starredGame.game.playCount.as("playCnt"),
-                gameImage.imageUrl.min().as("thumbnail")
-            ))
-            .from(starredGame)
-            .innerJoin(starredGame.game, game)
-            .innerJoin(starredGame.game.member, member)
-            .innerJoin(starredGame.game.images, gameImage)
-            .where(starredGame.member.id.eq(memberId))
-            .groupBy(
-                starredGame.id,
-                starredGame.game.id,
-                starredGame.game.category,
-                starredGame.game.title,
-                starredGame.game.member.nickname,
-                starredGame.game.createdAt,
-                starredGame.game.playCount)
-            .orderBy(starredGame.id.desc())
-            .fetch();
-
-    }
-
-    // 신고된 게임 목록 조회
-    @Override
-    public List<ReportedGameRes> findAllReportedGame() {
-        return jpaQueryFactory
-            .select(new QReportedGameRes(
-                reportedGame.id.as("reportId"),
-                reportedGame.reportMember.id.as("reportMemberId"),
-                reportedGame.reportedMember.id.as("reportedMemberId"),
-                reportedGame.game.id.as("gameId"),
-                reportedGame.reportType.as("reason").stringValue(),
-                reportedGame.game.title.as("gameTitle"),
-                reportedGame.reportMember.nickname.as("reportMemberNickname"),
-                reportedGame.reportedMember.nickname.as("reportedMemberNickname")
-            ))
-            .from(reportedGame)
-            .innerJoin(reportedGame.reportMember, member)
-            .innerJoin(reportedGame.reportedMember, member)
-            .orderBy(reportedGame.id.desc())
-            .fetch();
-    }
-
     // 회원 탈퇴시 해당 회원이 만든 게임을 삭제 하기 위한 조회
     @Override
     public List<Long> findGameIdsByMemberId(Long memberId) {
@@ -203,16 +147,6 @@ public class GameRepositoryImpl implements GameRepositorySupport {
             .innerJoin(game.images, gameImage)
             .where(searchCond(pageCondition.getSearchCondition(), pageCondition),
                 periodCond(pageCondition.getPeriodCondition())).fetch().size();
-    }
-
-
-    private OrderSpecifier orderCond(Pageable pageable) {
-        Sort.Order order = pageable.getSort().iterator().next();
-        if (order.getProperty().equals("createdDate")) {
-            return game.id.desc();
-        } else {
-            return game.playCount.desc();
-        }
     }
 
     // memberId 가 null 이면 isStarred 0 반환
@@ -238,6 +172,16 @@ public class GameRepositoryImpl implements GameRepositorySupport {
                 .where(starredGame.game.id.eq(game.id)),
             "starredCnt"
         );
+    }
+
+
+    private OrderSpecifier orderCond(Pageable pageable) {
+        Sort.Order order = pageable.getSort().iterator().next();
+        if (order.getProperty().equals("createdDate")) {
+            return game.id.desc();
+        } else {
+            return game.playCount.desc();
+        }
     }
 
     // 검색 조건

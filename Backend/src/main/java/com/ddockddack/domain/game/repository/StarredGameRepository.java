@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface StarredGameRepository extends JpaRepository<StarredGame, Long> {
+public interface StarredGameRepository extends JpaRepository<StarredGame, Long>, StarredGameRepositorySupport{
 
     Optional<StarredGame> findByMemberIdAndGameId(Long memberId, Long gameId);
 

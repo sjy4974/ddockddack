@@ -286,7 +286,7 @@ public class GameService {
     public List<StarredGameRes> findAllStarredGames(Long memberId) {
         memberRepository.findById(memberId).orElseThrow(() ->
                 new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
-        return gameRepository.findAllStarredGame(memberId);
+        return starredGameRepository.findAllStarredGame(memberId);
     }
 
     /**
@@ -297,7 +297,7 @@ public class GameService {
     @Transactional(readOnly = true)
     public List<ReportedGameRes> findAllReportedGames() {
 
-        return gameRepository.findAllReportedGame();
+        return reportedGameRepository.findAllReportedGame();
     }
 
     /**
