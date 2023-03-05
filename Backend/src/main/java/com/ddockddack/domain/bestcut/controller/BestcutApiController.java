@@ -125,7 +125,7 @@ public class BestcutApiController {
             memberId = ((MemberAccessRes) authentication.getPrincipal()).getId();
         }
 
-        PageImpl<BestcutRes> result = bestcutService.findAll(false, memberId, pageConditionReq);
+        PageImpl<BestcutRes> result = bestcutService.findAllBestcuts(false, memberId, pageConditionReq);
 
         return ResponseEntity.ok(result);
     }
@@ -139,7 +139,7 @@ public class BestcutApiController {
     public ResponseEntity<BestcutRes> bestcutFind(Authentication authentication,
         @PathVariable Long bestcutId) {
         Long memberId = ((MemberAccessRes) authentication.getPrincipal()).getId();
-        BestcutRes findBestcut = bestcutService.findOne(memberId, bestcutId);
+        BestcutRes findBestcut = bestcutService.findBestcut(memberId, bestcutId);
 
         return ResponseEntity.ok(findBestcut);
     }

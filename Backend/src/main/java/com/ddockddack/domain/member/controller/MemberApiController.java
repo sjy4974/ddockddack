@@ -57,7 +57,7 @@ public class MemberApiController {
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
     @PutMapping("/nickname")
-    public ResponseEntity modifyMemberNickname(@RequestBody MemberModifyNameReq
+    public ResponseEntity nicknameModify(@RequestBody MemberModifyNameReq
                                                        memberModifyNameReq) {
         try {
             MemberAccessRes memberAccessRes = (MemberAccessRes) SecurityContextHolder.getContext()
@@ -88,7 +88,7 @@ public class MemberApiController {
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
     @PutMapping("/profile")
-    public ResponseEntity modifyMemberProfileImg(
+    public ResponseEntity profileModify(
             @ModelAttribute MultipartFile profileImg
     ) {
         try {
@@ -104,7 +104,7 @@ public class MemberApiController {
 
             log.info("profileImg {}", profileImg.getOriginalFilename());
 
-            String imageName = memberService.modifyMemberProfileImg(member.get().getId(), profileImg);
+            String imageName = memberService.modifyMemberProfile(member.get().getId(), profileImg);
 
             return ResponseEntity.ok().body(imageName);
         } catch (Exception e) {
@@ -120,7 +120,7 @@ public class MemberApiController {
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
     @GetMapping()
-    public ResponseEntity getMemberInfo() {
+    public ResponseEntity memberDetails() {
         log.info("sec info {}",
                 SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString());
         MemberAccessRes memberAccessRes = Optional.ofNullable(
@@ -147,7 +147,7 @@ public class MemberApiController {
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
     @DeleteMapping()
-    public ResponseEntity deleteMember(HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity memberRemove(HttpServletRequest request, HttpServletResponse response) {
         Cookie[] cookies = request.getCookies();
 
         String refreshToken = null;
@@ -164,7 +164,7 @@ public class MemberApiController {
         MemberAccessRes memberAccessRes = Optional.ofNullable(
                 (MemberAccessRes) SecurityContextHolder.getContext()
                         .getAuthentication().getPrincipal()).get();
-        memberService.deleteMemberById(
+        memberService.removeMemberById(
                 memberAccessRes.getId()); //탈퇴로직에 access, refresh Token 정지시키는 로직 추가해야함
 
         log.info("withdrawal {} ", refreshToken);
@@ -184,7 +184,7 @@ public class MemberApiController {
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
     @GetMapping("/bestcuts")
-    public ResponseEntity getBestcuts(
+    public ResponseEntity myBestcutList(
         @ModelAttribute PageConditionReq pageCondition, Authentication authentication) {
         Long memberId = ((MemberAccessRes)authentication.getPrincipal()).getId();
         try {
@@ -206,7 +206,7 @@ public class MemberApiController {
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
     @GetMapping("/games")
-    public ResponseEntity getMyGames(
+    public ResponseEntity myGameList(
         @ModelAttribute PageConditionReq pageConditionReq, Authentication authentication) {
         Long memberId = ((MemberAccessRes)authentication.getPrincipal()).getId();
         try {
@@ -225,7 +225,7 @@ public class MemberApiController {
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
     @GetMapping("/starred")
-    public ResponseEntity getStarredGames(Authentication authentication) {
+    public ResponseEntity StarredGameList(Authentication authentication) {
         Long memberId = ((MemberAccessRes)authentication.getPrincipal()).getId();
         try {
             List<StarredGameRes> starredGameResList = gameService.findAllStarredGames(
@@ -244,7 +244,7 @@ public class MemberApiController {
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
     @GetMapping("/records")
-    public ResponseEntity getRecords(Authentication authentication) {
+    public ResponseEntity gameRoomHistoryList(Authentication authentication) {
         Long memberId = ((MemberAccessRes)authentication.getPrincipal()).getId();
         try {
             List<GameRoomHistoryRes> roomHistory = gameRoomService.findAllRoomHistory(memberId);
@@ -264,7 +264,7 @@ public class MemberApiController {
     })
     @GetMapping("/logout")
     public ResponseEntity
-    logoutUser(HttpServletRequest request, HttpServletResponse response) {
+    logout(HttpServletRequest request, HttpServletResponse response) {
         Cookie[] cookies = request.getCookies();
 
         String refreshToken = null;
@@ -286,118 +286,6 @@ public class MemberApiController {
         memberService.logout(refreshToken);
         return ResponseEntity.ok().build();
     }
-
-    private void checkLogin(String accessToken) {
-        if (accessToken == null) {
-            throw new AccessDeniedException(ErrorCode.LOGIN_REQUIRED); //권한이 없는 데이터 접속
-        }
-    }
-
-    private void unlinkKakao() {
-        //                HttpHeaders tokenHeaders = new HttpHeaders(); //로그아웃하면 accessToken 연결 끊기
-//                tokenHeaders.add("Authorization", "Bearer " + accessToken);
-//                tokenHeaders.add("Content-type", "application/x-www-form-urlencoded");
-//
-//                HttpEntity<MultiValueMap<String, String>> memberUnlinkReq = new HttpEntity<>(tokenHeaders);
-//
-//                RestTemplate rt = new RestTemplate();
-//
-//                ResponseEntity<String> memberUnlinkRes = rt.exchange(
-//                        "https://kapi.kakao.com/v1/member/unlink",
-//                        HttpMethod.POST,
-//                        memSberUnlinkReq,
-//                        String.class
-//                );
-
-//                System.out.println("=============================");
-//                System.out.println("유저 해제" + memberUnlinkRes);
-    }
-
-
-    /*@Operation(summary = "카카오 로그인", description = "카카오 로그인 메소드입니다.")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "성공"),
-        @ApiResponse(responseCode = "401", description = "인증 실패"),
-        @ApiResponse(responseCode = "404", description = "사용자 없음"),
-        @ApiResponse(responseCode = "500", description = "서버 오류")
-    })
-    @GetMapping("/kakaologin")
-    public ResponseEntity<?> kakaoRequestAccessToken(@RequestParam String code) {
-        //카카오 서버에 POST 방식으로 엑세스 토큰을 요청
-        //RestTemplate를 이용
-        try {
-            System.out.println(code);
-            String accessToken = memberService.getKaKaoAccessToken(code);
-
-            ResponseEntity<String> memberInfoResponse = memberService.getKakaoMember(accessToken);
-
-            JsonParser jp = new JsonParser();
-//            JsonObject jo = jp.parse(memberInfoResponse.getBody()).getAsJsonObject();
-
-            JsonObject memberJsonObject = jp.parse(memberInfoResponse.getBody()).getAsJsonObject();
-            JsonObject memberAccountObject = jp.parse(
-                memberJsonObject.get("kakao_account").toString()).getAsJsonObject();
-            String nickname = jp.parse(memberAccountObject.get("profile").toString())
-                .getAsJsonObject().get("nickname").getAsString();
-            String email = memberAccountObject.get("email").getAsString();
-
-            boolean isMember = memberService.findUserBySocialId(email);
-
-            if (!isMember) {
-                Member member = new Member(email, nickname, "", Role.MEMBER);
-                MemberInfoRes memberInfoRes = new MemberInfoRes(member.getNickname(),
-                    member.getProfile());
-
-                memberService.joinMember(member);
-
-                return ResponseEntity.ok(memberInfoRes);
-            }
-            //else
-            return ResponseEntity.ok(memberService.getMemberByEmail(email));
-        } catch (Exception e) {
-            System.out.println(e);
-            return ResponseEntity.status(500).body(e);
-        }
-
-    }
-
-    @Operation(summary = "구글 로그인", description = "구글 로그인 메소드입니다.")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "성공"),
-        @ApiResponse(responseCode = "401", description = "인증 실패"),
-        @ApiResponse(responseCode = "404", description = "사용자 없음"),
-        @ApiResponse(responseCode = "500", description = "서버 오류")
-    })
-    @GetMapping("/googlelogin")
-    public ResponseEntity<?> GoogleRequestAccessToken(@RequestParam String code) {
-        try {
-            String accessToken = memberService.getGoogleAccessToken(code);
-
-            ResponseEntity<String> memberInfoResponse = memberService.getGoogleMember(accessToken);
-
-            JsonParser jp = new JsonParser();
-
-            JsonObject memberJsonObject = jp.parse(memberInfoResponse.getBody()).getAsJsonObject();
-
-            String email = memberJsonObject.get("email").getAsString();
-            boolean isMember = memberService.findUserBySocialId(email);
-
-            if (!isMember) {
-                Member member = new Member(email, "", "", Role.MEMBER);
-                MemberInfoRes memberInfoRes = new MemberInfoRes(member.getNickname(),
-                    member.getProfile());
-
-                memberService.joinMember(member);
-
-                return ResponseEntity.ok(memberInfoRes);
-            }
-            //else
-            return ResponseEntity.ok(memberService.getMemberByEmail(email));
-
-        } catch (Exception e) {
-            throw new AccessDeniedException(ErrorCode.NOT_AUTHORIZED);
-        }
-    }*/
 
 }
 

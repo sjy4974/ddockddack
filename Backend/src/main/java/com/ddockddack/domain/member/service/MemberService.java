@@ -49,26 +49,6 @@ public class MemberService {
     //    private final RedisTemplate redisTemplate;
     private RestTemplate rt;
 
-//    /**
-//     * @param memberId
-//     * @param modifyMember
-//     * @return 수정된 member
-//     */
-//    @Transactional
-//    public Member modifyMember(Long memberId, MemberModifyReq modifyMember) {
-//        Member memberToModify = memberRepository.findById(memberId).get();
-//        if (!memberToModify.getNickname().equals(modifyMember.getNickname())) {
-//            memberToModify.setNickname(modifyMember.getNickname());
-//        }
-//        log.info("log! {}, {}", modifyMember.getProfile(), modifyMember.getProfile().isEmpty());
-//        if (!memberToModify.getProfile().equals(modifyMember.getProfile())) {
-//            memberToModify.setProfile(modifyMember.getProfile());
-//        }
-//
-//        return null;
-////        return memberRepository.save(memberToModify);
-//    }
-
     @Transactional
     public void modifyMemberNickname(Long memberId, MemberModifyNameReq modifyMemberNickname) {
         Member member = memberRepository.findById(memberId).get();
@@ -81,7 +61,7 @@ public class MemberService {
     }
 
     @Transactional
-    public String modifyMemberProfileImg(Long memberId, MultipartFile modifyProfileImg) {
+    public String modifyMemberProfile(Long memberId, MultipartFile modifyProfileImg) {
         Member member = memberRepository.findById(memberId).get();
 
         if (!(modifyProfileImg.getContentType().contains("image/jpg") ||
@@ -114,12 +94,8 @@ public class MemberService {
         return memberRepository.findById(memberId);
     }
 
-    public Member getMemberByEmail(String email) {
-        return memberRepository.getByEmail(email);
-    }
-
     @Transactional
-    public void deleteMemberById(Long memberId) {
+    public void removeMemberById(Long memberId) {
         List<Long> bestcutIds = bestcutService.findBestcutByMemberId(memberId);
         bestcutService.removeBestcutByMemberId(memberId);
         bestcutService.removeAllBestcutByIds(bestcutIds);
@@ -146,7 +122,7 @@ public class MemberService {
      * @param email
      * @return db에 입력된 email이 있는지
      */
-    public boolean findUserBySocialId(String email) {
+    public boolean findMemberByEmail(String email) {
         return memberRepository.existsByEmail(email);
     }
 
@@ -174,134 +150,13 @@ public class MemberService {
 //                    TimeUnit.MILLISECONDS);
 //        }
     }
-    /*
 
-     */
-/**
- * @param code
- * @return Access 토큰
- *//*
-
-    public String getKaKaoAccessToken(String code) {
-        //카카오 서버에 POST 방식으로 엑세스 토큰을 요청
-        //RestTemplate를 이용
-//        RestTemplate rt = new RestTemplate();
-
-        rt = new RestTemplate();
-
-        //HttpHeader 오브젝트 생성
-        HttpHeaders headers = new HttpHeaders();
-
-//        System.out.println("인가 코드 확인 :" + code);
-//        System.out.println(env.getProperty("kakao.api_key"));
-//        System.out.println(env.getProperty("kakao.login.redirect_uri"));
-
-        //HttpBody 오브젝트 생성
-        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        params.add("grant_type", "authorization_code");
-        params.add("client_id", env.getProperty("kakao.api_key"));
-        params.add("client_secret", env.getProperty("kakao.client-secret"));
-        params.add("redirect_uri", env.getProperty("kakao.login.redirect_uri"));
-        params.add("code", code);
-        //HttpHeader와 HttpBody를 HttpEntity에 담기
-        HttpEntity<MultiValueMap<String, String>> kakaoRequest = new HttpEntity<>(params, headers);
-        //카카오 서버에 HTTP 요청 - POST
-        ResponseEntity<String> response = rt.exchange(
-            "https://kauth.kakao.com/oauth/token",
-            HttpMethod.POST,
-            kakaoRequest,
-            String.class
-        );
-
-        System.out.println("response" + response);
-        //응답에서 엑세스 토큰 받기
-        JsonParser jp = new JsonParser();
-        JsonObject jo = jp.parse(response.getBody()).getAsJsonObject();
-        String accessToken = jo.get("access_token").getAsString();
-
-        return accessToken;
-    }
-
-    */
-
-    /**
-     * @param accessToken
-     * @return 카카오 사용자 정보
-     *//*
-
-    public ResponseEntity<String> getKakaoMember(String accessToken) {
-        //엑세스 토큰을 통해 사용자 정보를 응답 받기
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization", "Bearer " + accessToken);
-        headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
-
-        HttpEntity<MultiValueMap<String, String>> memberInfoRequest = new HttpEntity<>(headers);
-
-        RestTemplate rt = new RestTemplate();
-
-        ResponseEntity<String> memberInfoResponse = rt.exchange(
-            "https://kapi.kakao.com/v2/user/me",
-            HttpMethod.POST,
-            memberInfoRequest,
-            String.class
-        );
-
-        System.out.println("userinfo " + memberInfoResponse);
-
-        return memberInfoResponse;
-    }
-
-    public String getGoogleAccessToken(String code) {
-        RestTemplate rt = new RestTemplate();
-
-        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(
-                "https://www.googleapis.com/oauth2/v4/token")
-            .queryParam("code", code)
-            .queryParam("client_id", env.getProperty("login.google.client_id"))
-            .queryParam("client_secret", env.getProperty("login.google.client_secret"))
-            .queryParam("redirect_uri", env.getProperty("login.google.redirect_uri"))
-            .queryParam("grant_type", "authorization_code");
-
-        HttpEntity request = new HttpEntity<>(new HttpHeaders());
-
-        ResponseEntity<String> response = rt.exchange(
-            uriBuilder.toUriString(),
-            HttpMethod.POST,
-            request,
-            String.class
-        );
-        JsonParser jp = new JsonParser();
-        JsonObject jo = jp.parse(response.getBody()).getAsJsonObject();
-
-        return jo.get("access_token").getAsString();
-    }
-
-    public ResponseEntity<String> getGoogleMember(String accessToken) {
-        rt = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-
-        System.out.println(accessToken);
-        headers.add("Authorization", "Bearer " + accessToken);
-
-        HttpEntity memberInfoRequest = new HttpEntity<>(headers);
-
-        ResponseEntity<String> responsememberInfo = rt.exchange(UriComponentsBuilder
-                .fromHttpUrl("https://www.googleapis.com/oauth2/v2/userinfo")
-                .toUriString(),
-            HttpMethod.GET,
-            memberInfoRequest,
-            String.class);
-
-        return responsememberInfo;
-    }
-*/
     @Transactional
     public Member banMember(Long memberId, BanLevel banLevel) {
         Member memberToModify = memberRepository.findById(memberId).get();
 
         memberToModify.setRole(Role.BAN);
-        memberToModify.setReleaseDate(getReleaseDate(banLevel));
+        memberToModify.setReleaseDate(findReleaseDate(banLevel));
 
         return memberRepository.save(memberToModify);
     }
@@ -316,7 +171,7 @@ public class MemberService {
         return memberRepository.save(memberToModify);
     }
 
-    public LocalDate getReleaseDate(BanLevel banLevel) {
+    public LocalDate findReleaseDate(BanLevel banLevel) {
         LocalDate today = LocalDate.now();
 
         switch (banLevel) {

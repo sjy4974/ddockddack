@@ -51,16 +51,9 @@ public class AdminApiController {
         @ApiResponse(responseCode = "403", description = "허가되지 않은 사용자"),
         @ApiResponse(responseCode = "500", description = "서버 오류")
     })
-    public ResponseEntity<?> reportedGameList(
-        @RequestHeader(value = "access-token", required = true) String accessToken) {
-        System.out.println(accessToken);
-        try {
-            List<ReportedGameRes> allReportedGames = gameService.findAllReportedGames();
-            return ResponseEntity.ok(allReportedGames);
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body(e);
-        }
+    public ResponseEntity<List<ReportedGameRes>> reportedGameList() {
 
+        return ResponseEntity.ok(gameService.findAllReportedGames());
     }
 
     @GetMapping("/reported/bestcuts")
@@ -70,15 +63,9 @@ public class AdminApiController {
         @ApiResponse(responseCode = "403", description = "허가되지 않은 사용자"),
         @ApiResponse(responseCode = "500", description = "서버 오류")
     })
-    public ResponseEntity<?> reportedBestCutList(
-        @RequestHeader(value = "access-token", required = true) String accessToken) {
+    public ResponseEntity<List<ReportedBestcutRes>> reportedBestCutList() {
 
-        try {
-            List<ReportedBestcutRes> allReportedBestCuts = bestcutService.findAllReportedBestCuts();
-            return ResponseEntity.ok(allReportedBestCuts);
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body(e);
-        }
+        return ResponseEntity.ok(bestcutService.findAllReportedBestCuts());
 
     }
 
@@ -91,7 +78,7 @@ public class AdminApiController {
         @ApiResponse(responseCode = "404", description = "존재 하지 않는 게임"),
         @ApiResponse(responseCode = "404", description = "존재 하지 않는 유저")
     })
-    public ResponseEntity reportedGameDelete(@PathVariable Long gameId, @PathVariable Long reportId,
+    public ResponseEntity reportedGameRemove(@PathVariable Long gameId, @PathVariable Long reportId,
         @RequestHeader(value = "access-token", required = true) String accessToken,
         @RequestHeader(value = "banMemberId", required = true) Long banMemberId,
         @RequestHeader(value = "banLevel", required = true) String banLevel) {
@@ -116,7 +103,7 @@ public class AdminApiController {
         @ApiResponse(responseCode = "404", description = "존재 하지 않는 신고"),
         @ApiResponse(responseCode = "404", description = "존재 하지 않는 유저")
     })
-    public ResponseEntity gameReportDelete(@PathVariable Long reportId,
+    public ResponseEntity gameReportRemove(@PathVariable Long reportId,
         @RequestHeader(value = "access-token", required = true) String accessToken) {
 
         reportService.removeReportedGame(reportId);
@@ -134,7 +121,7 @@ public class AdminApiController {
         @ApiResponse(description = "존재하지 않는 베스트컷", responseCode = "404"),
         @ApiResponse(description = "존재하지 않는 멤버", responseCode = "404"),
     })
-    public ResponseEntity reportedBestCutDelete(@PathVariable Long bestcutId,
+    public ResponseEntity bestcutRemove(@PathVariable Long bestcutId,
         @PathVariable Long reportId,
         @RequestHeader(value = "access-token", required = true) String accessToken,
         @RequestHeader(value = "banMemberId", required = true) Long banMemberId,
@@ -158,7 +145,7 @@ public class AdminApiController {
         @ApiResponse(description = "존재하지 않는 신고", responseCode = "404"),
         @ApiResponse(description = "존재하지 않는 멤버", responseCode = "404"),
     })
-    public ResponseEntity BestCutReportDelete(@PathVariable Long reportId,
+    public ResponseEntity reportedBestcutRemove(@PathVariable Long reportId,
         @RequestHeader(value = "access-token", required = true) String accessToken) {
 
         reportService.removeReportedBestcut(reportId);
@@ -174,16 +161,11 @@ public class AdminApiController {
         @ApiResponse(responseCode = "404", description = "존재하지 않는 유저"),
         @ApiResponse(responseCode = "500", description = "서버 오류")
     })
-    public ResponseEntity<?> banMember(@PathVariable Long banMemberId,
-        @RequestHeader(value = "access-token", required = true) String accessToken,
+    public ResponseEntity memberBan(@PathVariable Long banMemberId,
         @RequestBody Map<String, Object> Data) {
-
         BanLevel banLevel = stringToEnum((String) Data.get("banLevel"));
 
-        try {
-            return ResponseEntity.ok(memberService.banMember(banMemberId, banLevel));
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body(e.getMessage());
-        }
+        return ResponseEntity.ok(memberService.banMember(banMemberId, banLevel));
+
     }
 }

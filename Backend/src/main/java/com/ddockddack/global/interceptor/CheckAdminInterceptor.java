@@ -40,7 +40,7 @@ public class CheckAdminInterceptor implements HandlerInterceptor {
             Long adminId = tokenService.getUid(accessToken);
 
             // admin 확인
-            if(adminService.isAdminByAccessToken(adminId)){
+            if(adminService.isAdmin(adminId)){
                 return HandlerInterceptor.super.preHandle(request, response, handler);
             }
         }
