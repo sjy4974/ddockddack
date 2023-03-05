@@ -134,19 +134,19 @@ public class GameRoomRepository {
      * @return
      */
     public String createPinNumber() {
-        String pin = intToPin(random.nextInt(PIN_NUMBER_BOUND));
+        String pin = formatPin(random.nextInt(PIN_NUMBER_BOUND));
         while (gameRooms.containsKey(pin)) {
-            pin = intToPin(random.nextInt(PIN_NUMBER_BOUND));
+            pin = formatPin(random.nextInt(PIN_NUMBER_BOUND));
         }
         return pin;
     }
 
     /**
-     * 문자열 핀 넘버를 숫자로 변환
+     * 핀 넘버 포맷팅
      * @param num
      * @return
      */
-    public String intToPin(int num) {
+    public String formatPin(int num) {
         return String.format("%06d", num);
     }
 
@@ -181,7 +181,7 @@ public class GameRoomRepository {
      * @param pinNumber
      * @throws JsonProcessingException
      */
-    public void updateGameRoom(String pinNumber) throws JsonProcessingException {
+    public void startGame(String pinNumber) throws JsonProcessingException {
         GameRoom gameRoom = this.gameRooms.get(pinNumber);
         gameRoom.start();
 

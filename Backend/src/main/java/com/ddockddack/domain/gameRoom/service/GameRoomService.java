@@ -48,7 +48,7 @@ public class GameRoomService {
      * @throws OpenViduJavaClientException
      * @throws OpenViduHttpException
      */
-    public String createRoom(Long gameId)
+    public String createGameRoom(Long gameId)
             throws OpenViduJavaClientException, OpenViduHttpException {
         Game game = gameRepository.findById(gameId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.GAME_NOT_FOUND));
@@ -66,7 +66,7 @@ public class GameRoomService {
      * @throws OpenViduJavaClientException
      * @throws OpenViduHttpException
      */
-    public GameRoomRes joinRoom(String pinNumber, Long memberId, String nickname, String clientIp)
+    public GameRoomRes joinGameRoom(String pinNumber, Long memberId, String nickname, String clientIp)
             throws OpenViduJavaClientException, OpenViduHttpException {
         Member member = null;
         //로그인 한 유저면 memberId로 검색해서 넘겨줌
@@ -152,30 +152,18 @@ public class GameRoomService {
 
         // 게임 play count +1 증가
         game.increasePlayCount();
-        gameRoomRepository.updateGameRoom(pinNumber);
+        gameRoomRepository.startGame(pinNumber);
 
     }
 
     /**
-     * 게임 시작 여부 조회
-     *
-     * @param pinNumber
-     * @return
-     */
-    public Boolean isStartedGame(String pinNumber) {
-        GameRoom gameRoom = gameRoomRepository.findById(pinNumber).orElseThrow(() ->
-                new NotFoundException(ErrorCode.GAME_ROOM_NOT_FOUND));
-        return gameRoom.isStarted();
-    }
-
-    /**
-     * 게임 멤버 이미지 저장
+     * 게임 멤버 이미지 채점 및 저장
      *
      * @param pinNumber
      * @param sessionId
      * @param param
      */
-    public void scoringImage(String pinNumber, String sessionId, Map<String, String> param)
+    public void scoringUserImage(String pinNumber, String sessionId, Map<String, String> param)
             throws Exception {
         gameRoomRepository.findById(pinNumber).orElseThrow(() ->
                 new NotFoundException(ErrorCode.GAME_ROOM_NOT_FOUND));
@@ -183,22 +171,6 @@ public class GameRoomService {
         byte[] byteImage = Base64.decodeBase64(param.get("memberGameImage"));
         int rawScore = ensembleModel.CalculateSimilarity(byteGameImage, byteImage);
         gameRoomRepository.saveScore(pinNumber, sessionId, byteImage, rawScore);
-    }
-
-    /**
-     * 게임 이력 전체 조회
-     *
-     * @param memberId
-     * @return
-     */
-    @Transactional(readOnly = true)
-    public List<GameRoomHistoryRes> findAllRoomHistory(Long memberId) {
-        memberRepository.findById(memberId).orElseThrow(() ->
-                new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
-
-        List<GameRoomHistory> list = gameRoomHistoryRepository.findByMemberId(memberId);
-
-        return list.stream().map(GameRoomHistoryRes::of).collect(Collectors.toList());
     }
 
     /**
@@ -217,7 +189,24 @@ public class GameRoomService {
      * @param pinNumber
      * @return
      */
-    public void finalResult(String pinNumber) throws JsonProcessingException {
+    public void getFinalResult(String pinNumber) throws JsonProcessingException {
         gameRoomRepository.finalResult(pinNumber);
+    }
+
+
+    /**
+     * 게임 이력 전체 조회
+     *
+     * @param memberId
+     * @return
+     */
+    @Transactional(readOnly = true)
+    public List<GameRoomHistoryRes> findAllRoomHistory(Long memberId) {
+        memberRepository.findById(memberId).orElseThrow(() ->
+            new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
+
+        List<GameRoomHistory> list = gameRoomHistoryRepository.findByMemberId(memberId);
+
+        return list.stream().map(GameRoomHistoryRes::of).collect(Collectors.toList());
     }
 }
