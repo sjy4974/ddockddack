@@ -190,7 +190,7 @@ public class MemberApiController {
         try {
             log.info("bestcuts {}, {}", memberId, pageCondition.toString());
 
-            PageImpl<BestcutRes> bestcutRes = bestcutService.findAll(true, memberId, pageCondition);
+            PageImpl<BestcutRes> bestcutRes = bestcutService.findAllBestcuts(true, memberId, pageCondition);
             log.info("bestcuts2 {}", bestcutRes);
             return ResponseEntity.ok(bestcutRes);
         } catch (Exception e) {
