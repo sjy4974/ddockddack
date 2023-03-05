@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
-public class GameRoomHistoryRepositoryImpl implements GameRoomHistoryRepositorySupport{
+public class GameRoomHistoryRepositoryImpl implements GameRoomHistoryRepositorySupport {
 
     private final JPAQueryFactory jpaQueryFactory;
 
