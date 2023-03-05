@@ -43,7 +43,6 @@ public class GameRoomHistory extends BaseEntity {
         this.ranking = ranking;
     }
 
-
     public static GameRoomHistory from(Long memberId, String gameTitle, int ranking) {
         return GameRoomHistory.builder()
             .memberId(memberId)
