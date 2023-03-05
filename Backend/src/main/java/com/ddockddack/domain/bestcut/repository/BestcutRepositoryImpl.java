@@ -41,6 +41,7 @@ public class BestcutRepositoryImpl implements BestcutRepositorySupport {
                 new QBestcutRes(bestcut.id.as("bestcutId"), bestcut.title.as("bestcutImgTitle"),
                     bestcut.imageUrl.as("bestcutImgUrl"), bestcut.gameTitle,
                     bestcut.gameImageUrl, bestcut.gameImgDesc,
+                    bestcut.member.id.as("memberId"),
                     bestcut.createdAt.as("createdDate"), getLikeCnt(),
                     getIsLiked(loginMemberId), member.profile.as("profileImgUrl"),
                     member.nickname)).from(bestcut).join(bestcut.member, member)
@@ -60,6 +61,7 @@ public class BestcutRepositoryImpl implements BestcutRepositorySupport {
                 new QBestcutRes(bestcut.id.as("bestcutId"), bestcut.title.as("bestcutImgTitle"),
                     bestcut.imageUrl.as("bestcutImgUrl"), bestcut.gameTitle,
                     bestcut.gameImageUrl, bestcut.gameImgDesc,
+                    bestcut.member.id.as("memberId"),
                     bestcut.createdAt.as("createdDate"), getLikeCnt(),
                     getIsLiked(loginMemberId), member.profile.as("profileImgUrl"),
                     member.nickname)).from(bestcut).join(bestcut.member, member)
