@@ -39,7 +39,6 @@ public class AdminApiController {
     private final MemberService memberService;
     private final ReportService reportService;
 
-    @JsonCreator
     public static BanLevel stringToEnum(String input) {
         return BanLevel.valueOf(input);
     }
