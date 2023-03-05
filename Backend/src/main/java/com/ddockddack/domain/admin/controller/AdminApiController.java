@@ -7,7 +7,6 @@ import com.ddockddack.domain.game.service.GameService;
 import com.ddockddack.domain.member.response.MemberAccessRes;
 import com.ddockddack.domain.member.service.BanLevel;
 import com.ddockddack.domain.member.service.MemberService;
-import com.ddockddack.domain.member.service.TokenService;
 import com.ddockddack.domain.report.service.ReportService;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.v3.oas.annotations.Operation;
@@ -37,7 +36,6 @@ public class AdminApiController {
 
     private final BestcutService bestcutService;
     private final GameService gameService;
-    private final TokenService tokenService;
     private final MemberService memberService;
     private final ReportService reportService;
 
@@ -88,7 +86,7 @@ public class AdminApiController {
         Long adminId = ((MemberAccessRes) authentication.getPrincipal()).getId();
 
         gameService.removeGame(adminId, gameId);
-        if (stringToEnum(banLevel) != BanLevel.noPenalty) {
+        if (stringToEnum(banLevel) != BanLevel.NO_PENALTY) {
             memberService.banMember(banMemberId, stringToEnum(banLevel));
         }
 
@@ -129,7 +127,7 @@ public class AdminApiController {
         Long adminId = ((MemberAccessRes) authentication.getPrincipal()).getId();
 
         bestcutService.removeBestcut(bestcutId, adminId);
-        if (stringToEnum(banLevel) != BanLevel.noPenalty) {
+        if (stringToEnum(banLevel) != BanLevel.NO_PENALTY) {
             memberService.banMember(banMemberId, stringToEnum(banLevel));
         }
 

@@ -3,7 +3,6 @@ package com.ddockddack.domain.member.service;
 import com.ddockddack.domain.bestcut.service.BestcutService;
 import com.ddockddack.domain.game.repository.GameImageRepository;
 import com.ddockddack.domain.game.repository.GameRepository;
-import com.ddockddack.domain.game.repository.GameRepositorySupport;
 import com.ddockddack.domain.game.repository.StarredGameRepository;
 import com.ddockddack.domain.gameRoom.repository.GameRoomHistoryRepository;
 import com.ddockddack.domain.gameRoom.repository.GameRoomHistoryRepositorySupport;
@@ -12,10 +11,10 @@ import com.ddockddack.domain.member.entity.Role;
 import com.ddockddack.domain.member.repository.MemberRepository;
 import com.ddockddack.domain.member.request.MemberModifyNameReq;
 import com.ddockddack.domain.report.repository.ReportedGameRepository;
+import com.ddockddack.global.aws.AwsS3;
 import com.ddockddack.global.error.ErrorCode;
 import com.ddockddack.global.error.exception.ImageExtensionException;
 import com.ddockddack.global.error.exception.NotFoundException;
-import com.ddockddack.global.aws.AwsS3;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -175,19 +174,19 @@ public class MemberService {
         LocalDate today = LocalDate.now();
 
         switch (banLevel) {
-            case oneWeek:
+            case ONE_WEEK:
                 today.plusDays(7);
                 break;
-            case oneMonth:
+            case ONE_MONTH:
                 today.plusMonths(1);
                 break;
-            case sixMonth:
+            case SIX_MONTH:
                 today.plusMonths(6);
                 break;
-            case oneYear:
+            case ONE_YEAR:
                 today.plusYears(1);
                 break;
-            case endless:
+            case ENDLESS:
                 today.plusYears(9999);
                 break;
         }

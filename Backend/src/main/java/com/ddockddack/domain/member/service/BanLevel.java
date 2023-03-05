@@ -1,10 +1,10 @@
 package com.ddockddack.domain.member.service;
 
 public enum BanLevel {
-    noPenalty,
-    oneWeek,
-    oneMonth,
-    sixMonth,
-    oneYear,
-    endless
+    NO_PENALTY,
+    ONE_WEEK,
+    ONE_MONTH,
+    SIX_MONTH,
+    ONE_YEAR,
+    ENDLESS
 }
