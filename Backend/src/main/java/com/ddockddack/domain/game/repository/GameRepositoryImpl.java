@@ -127,27 +127,6 @@ public class GameRepositoryImpl implements GameRepositorySupport {
             getTotalPageCount(memberId, pageCondition));
     }
 
-    // 신고된 게임 목록 조회
-    @Override
-    public List<ReportedGameRes> findAllReportedGame() {
-        return jpaQueryFactory
-            .select(new QReportedGameRes(
-                reportedGame.id.as("reportId"),
-                reportedGame.reportMember.id.as("reportMemberId"),
-                reportedGame.reportedMember.id.as("reportedMemberId"),
-                reportedGame.game.id.as("gameId"),
-                reportedGame.reportType.as("reason").stringValue(),
-                reportedGame.game.title.as("gameTitle"),
-                reportedGame.reportMember.nickname.as("reportMemberNickname"),
-                reportedGame.reportedMember.nickname.as("reportedMemberNickname")
-            ))
-            .from(reportedGame)
-            .innerJoin(reportedGame.reportMember, member)
-            .innerJoin(reportedGame.reportedMember, member)
-            .orderBy(reportedGame.id.desc())
-            .fetch();
-    }
-
     // 회원 탈퇴시 해당 회원이 만든 게임을 삭제 하기 위한 조회
     @Override
     public List<Long> findGameIdsByMemberId(Long memberId) {

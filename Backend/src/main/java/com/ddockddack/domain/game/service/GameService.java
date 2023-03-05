@@ -297,7 +297,7 @@ public class GameService {
     @Transactional(readOnly = true)
     public List<ReportedGameRes> findAllReportedGames() {
 
-        return gameRepository.findAllReportedGame();
+        return reportedGameRepository.findAllReportedGame();
     }
 
     /**
