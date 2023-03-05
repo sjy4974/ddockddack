@@ -4,6 +4,7 @@ import com.ddockddack.domain.bestcut.response.ReportedBestcutRes;
 import com.ddockddack.domain.bestcut.service.BestcutService;
 import com.ddockddack.domain.game.response.ReportedGameRes;
 import com.ddockddack.domain.game.service.GameService;
+import com.ddockddack.domain.member.response.MemberAccessRes;
 import com.ddockddack.domain.member.service.BanLevel;
 import com.ddockddack.domain.member.service.MemberService;
 import com.ddockddack.domain.member.service.TokenService;
@@ -17,6 +18,7 @@ import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -78,12 +80,12 @@ public class AdminApiController {
         @ApiResponse(responseCode = "404", description = "존재 하지 않는 게임"),
         @ApiResponse(responseCode = "404", description = "존재 하지 않는 유저")
     })
-    public ResponseEntity reportedGameRemove(@PathVariable Long gameId, @PathVariable Long reportId,
-        @RequestHeader(value = "access-token", required = true) String accessToken,
+    public ResponseEntity reportedGameRemove(@PathVariable Long gameId,
         @RequestHeader(value = "banMemberId", required = true) Long banMemberId,
-        @RequestHeader(value = "banLevel", required = true) String banLevel) {
+        @RequestHeader(value = "banLevel", required = true) String banLevel,
+        Authentication authentication) {
 
-        Long adminId = tokenService.getUid(accessToken);
+        Long adminId = ((MemberAccessRes) authentication.getPrincipal()).getId();
 
         gameService.removeGame(adminId, gameId);
         if (stringToEnum(banLevel) != BanLevel.noPenalty) {
@@ -103,8 +105,7 @@ public class AdminApiController {
         @ApiResponse(responseCode = "404", description = "존재 하지 않는 신고"),
         @ApiResponse(responseCode = "404", description = "존재 하지 않는 유저")
     })
-    public ResponseEntity gameReportRemove(@PathVariable Long reportId,
-        @RequestHeader(value = "access-token", required = true) String accessToken) {
+    public ResponseEntity gameReportRemove(@PathVariable Long reportId) {
 
         reportService.removeReportedGame(reportId);
 
@@ -122,11 +123,10 @@ public class AdminApiController {
         @ApiResponse(description = "존재하지 않는 멤버", responseCode = "404"),
     })
     public ResponseEntity bestcutRemove(@PathVariable Long bestcutId,
-        @PathVariable Long reportId,
-        @RequestHeader(value = "access-token", required = true) String accessToken,
         @RequestHeader(value = "banMemberId", required = true) Long banMemberId,
-        @RequestHeader(value = "banLevel", required = true) String banLevel) {
-        Long adminId = tokenService.getUid(accessToken);
+        @RequestHeader(value = "banLevel", required = true) String banLevel,
+        Authentication authentication) {
+        Long adminId = ((MemberAccessRes) authentication.getPrincipal()).getId();
 
         bestcutService.removeBestcut(bestcutId, adminId);
         if (stringToEnum(banLevel) != BanLevel.noPenalty) {
@@ -145,8 +145,7 @@ public class AdminApiController {
         @ApiResponse(description = "존재하지 않는 신고", responseCode = "404"),
         @ApiResponse(description = "존재하지 않는 멤버", responseCode = "404"),
     })
-    public ResponseEntity reportedBestcutRemove(@PathVariable Long reportId,
-        @RequestHeader(value = "access-token", required = true) String accessToken) {
+    public ResponseEntity reportedBestcutRemove(@PathVariable Long reportId) {
 
         reportService.removeReportedBestcut(reportId);
 
@@ -162,8 +161,8 @@ public class AdminApiController {
         @ApiResponse(responseCode = "500", description = "서버 오류")
     })
     public ResponseEntity memberBan(@PathVariable Long banMemberId,
-        @RequestBody Map<String, Object> Data) {
-        BanLevel banLevel = stringToEnum((String) Data.get("banLevel"));
+        @RequestBody Map<String, Object> data) {
+        BanLevel banLevel = stringToEnum((String) data.get("banLevel"));
 
         return ResponseEntity.ok(memberService.banMember(banMemberId, banLevel));
 
