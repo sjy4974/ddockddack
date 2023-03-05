@@ -120,9 +120,9 @@ public class MemberService {
 
     @Transactional
     public void deleteMemberById(Long memberId) {
-        List<Long> bestcutIds = bestcutService.findByMemberId(memberId);
-        bestcutService.removeByMemberId(memberId);
-        bestcutService.removeAllByIds(bestcutIds);
+        List<Long> bestcutIds = bestcutService.findBestcutByMemberId(memberId);
+        bestcutService.removeBestcutByMemberId(memberId);
+        bestcutService.removeAllBestcutByIds(bestcutIds);
 
         List<Long> gameIds = gameRepository.findGameIdsByMemberId(memberId);
         gameImageRepository.deleteAllByGameId(gameIds);

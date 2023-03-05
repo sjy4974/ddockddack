@@ -102,7 +102,7 @@ public class BestcutService {
     }
 
     @Transactional
-    public void removeAllByIds(List<Long> bestcutIds) {
+    public void removeAllBestcutByIds(List<Long> bestcutIds) {
         bestcutLikeRepository.deleteByBestcutIdIn(bestcutIds);
         reportedBestcutRepository.deleteByBestcutIdIn(bestcutIds);
 
@@ -110,7 +110,7 @@ public class BestcutService {
     }
 
     @Transactional
-    public void removeByMemberId(Long memberId) {
+    public void removeBestcutByMemberId(Long memberId) {
         bestcutLikeRepository.deleteByMemberId(memberId);
         reportedBestcutRepository.deleteByMemberId(memberId);
     }
@@ -141,17 +141,17 @@ public class BestcutService {
      * @param pageConditionReq
      * @return
      */
-    public PageImpl<BestcutRes> findAll(Boolean my, Long loginMemberId,
+    public PageImpl<BestcutRes> findAllBestcuts(Boolean my, Long loginMemberId,
         PageConditionReq pageConditionReq) {
         PageCondition pageCondition = pageConditionReq.toEntity();
         return bestcutRepository.findAllBySearch(my, loginMemberId, pageCondition);
     }
 
-    public List<Long> findByMemberId(Long memberId) {
+    public List<Long> findBestcutByMemberId(Long memberId) {
         return bestcutRepository.findAllBestcutIdByMemberId(memberId);
     }
 
-    public BestcutRes findOne(Long loginMemberId, Long bestcutId) {
+    public BestcutRes findBestcut(Long loginMemberId, Long bestcutId) {
         return bestcutRepository.findOne(loginMemberId, bestcutId)
             .orElseThrow(() -> new NotFoundException(ErrorCode.BESTCUT_NOT_FOUND));
     }
