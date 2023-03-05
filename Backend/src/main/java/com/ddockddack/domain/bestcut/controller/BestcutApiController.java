@@ -54,7 +54,7 @@ public class BestcutApiController {
         @ApiResponse(description = "존재하지 않는 베스트컷", responseCode = "404"),
         @ApiResponse(description = "존재하지 않는 멤버", responseCode = "404"),
     })
-    public ResponseEntity bestcutDelete(@PathVariable Long bestcutId,
+    public ResponseEntity bestcutRemove(@PathVariable Long bestcutId,
         Authentication authentication) {
         Long memberId = ((MemberAccessRes) authentication.getPrincipal()).getId();
         bestcutService.removeBestcut(bestcutId, memberId);
