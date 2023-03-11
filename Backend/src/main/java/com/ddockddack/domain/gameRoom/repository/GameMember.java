@@ -1,22 +1,19 @@
 package com.ddockddack.domain.gameRoom.repository;
 
 import com.ddockddack.domain.member.entity.Member;
-import lombok.AllArgsConstructor;
+import java.util.ArrayList;
+import java.util.List;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Observable;
-
-// Subject class
-@Getter @Setter
+@Getter
 @ToString
 @NoArgsConstructor
-@AllArgsConstructor
 public class GameMember {
+
     private String socketId;
     private Member member;
     private String nickname;
@@ -26,10 +23,23 @@ public class GameMember {
     private String clientIp;
     private List<byte[]> images = new ArrayList<>();
 
+    @Builder
     public GameMember(String socketId, Member member, String nickname, String clientIp) {
         this.socketId = socketId;
         this.member = member;
         this.nickname = nickname;
         this.clientIp = clientIp;
+    }
+
+    public void changeRoundScore(int roundScore){
+        this.roundScore = roundScore;
+    }
+
+    public void changeScaledRoundScore(int scaledRoundScore){
+        this.scaledRoundScore = scaledRoundScore;
+    }
+
+    public void changeTotalScore(int totalScore){
+        this.totalScore = totalScore;
     }
 }

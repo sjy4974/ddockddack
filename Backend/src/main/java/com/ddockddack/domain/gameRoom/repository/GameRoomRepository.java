@@ -2,9 +2,7 @@ package com.ddockddack.domain.gameRoom.repository;
 
 import com.ddockddack.domain.game.entity.Game;
 import com.ddockddack.domain.game.entity.GameImage;
-import com.ddockddack.domain.gameRoom.repository.GameRoom;
 import com.ddockddack.domain.gameRoom.entity.GameRoomHistory;
-import com.ddockddack.domain.gameRoom.request.GameSignalReq;
 import com.ddockddack.domain.gameRoom.response.GameMemberRes;
 import com.ddockddack.domain.member.entity.Member;
 import com.ddockddack.global.error.ErrorCode;
@@ -103,7 +101,7 @@ public class GameRoomRepository {
         Session session = findSessionByPinNumber(pinNumber).orElseThrow(
                 () -> new NotFoundException(ErrorCode.GAME_ROOM_NOT_FOUND));
 
-
+        // 방 인원 제한 최대 7명
         if (openvidu.getActiveSession(pinNumber).getConnections().size() == 7) {
             throw new AccessDeniedException(ErrorCode.MAXIMUM_MEMBER);
         }
@@ -112,10 +110,18 @@ public class GameRoomRepository {
         ConnectionProperties properties = ConnectionProperties.fromJson(new HashMap<>()).build();
         Connection connection = session.createConnection(properties);
 
-        //member를 gameMember로 변환하여 gameRoom에 저장
+        // member를 gameMember으로 변환하여 gameRoom에 저장
         String socketId = connection.getConnectionId();
-        GameMember gameMember = new GameMember(socketId, member, nickname, clientIp);
-        gameRooms.get(pinNumber).getMembers().put(socketId, gameMember);
+        GameMember gameMember = GameMember.builder()
+            .socketId(socketId)
+            .member(member)
+            .nickname(nickname)
+            .clientIp(clientIp)
+            .build();
+
+        gameRooms.get(pinNumber)
+            .getMembers()
+            .put(socketId, gameMember);
 
         return connection.getToken();
     }
@@ -214,7 +220,7 @@ public class GameRoomRepository {
         GameRoom gameRoom = this.gameRooms.get(pinNumber);
         GameMember gameMember = gameRoom.getMembers().get(sessionId);
         gameMember.getImages().add(byteImage);
-        gameMember.setRoundScore(rawScore);
+        gameMember.changeRoundScore(rawScore);
         gameRoom.increaseScoreCnt();
 
         if (gameRoom.getScoreCount() == gameRoom.getMembers().size()) {
@@ -222,8 +228,8 @@ public class GameRoomRepository {
             int maxRoundScore = Collections.max(roundResultData, Comparator.comparing(GameMemberRes::getRoundScore)).getRoundScore();
             for (GameMember member : gameRoom.getMembers().values()) {
                 int scaledRoundScore = (int) (((double) member.getRoundScore() / maxRoundScore) * 100); //max score per round is +100 point
-                member.setScaledRoundScore(scaledRoundScore);
-                member.setTotalScore(member.getTotalScore() + scaledRoundScore);
+                member.changeScaledRoundScore(scaledRoundScore);
+                member.changeTotalScore(member.getTotalScore() + scaledRoundScore);
             }
 
             String resultData = mapper.writeValueAsString(roundResultData);
