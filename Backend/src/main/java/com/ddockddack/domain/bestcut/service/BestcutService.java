@@ -107,7 +107,7 @@ public class BestcutService {
     @Transactional
     public void reportBestcut(Long memberId, Long bestcutId, ReportType reportType) {
         Member member = memberRepository.findById(memberId)
-            .orElseThrow(() -> new org.webjars.NotFoundException("존재하지 않는 멤버"));
+            .orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
         Bestcut bestcut = bestcutRepository.findById(bestcutId)
             .orElseThrow(() -> new NotFoundException(ErrorCode.BESTCUT_NOT_FOUND));
         if (reportedBestcutRepository.existsByReportMemberIdAndBestcutId(memberId, bestcutId)) {
