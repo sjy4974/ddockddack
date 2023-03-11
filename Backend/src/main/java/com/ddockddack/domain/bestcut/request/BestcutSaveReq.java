@@ -1,5 +1,7 @@
 package com.ddockddack.domain.bestcut.request;
 
+import com.ddockddack.domain.bestcut.entity.Bestcut;
+import com.ddockddack.domain.member.entity.Member;
 import java.util.List;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
@@ -30,4 +32,14 @@ public class BestcutSaveReq {
     @NotNull(message = "images can't be null")
     private List<BestcutImageReq> images;
 
+    public Bestcut toEntity(Member member, int imageIndex, String fileName){
+        return Bestcut.builder()
+            .member(member)
+            .gameTitle(this.getGameTitle())
+            .gameImageUrl(images.get(imageIndex).getGameImgUrl())
+            .gameImgDesc(images.get(imageIndex).getGameImgDesc())
+            .imageUrl(fileName)
+            .title(images.get(imageIndex).getBestcutImgTitle())
+            .build();
+    }
 }

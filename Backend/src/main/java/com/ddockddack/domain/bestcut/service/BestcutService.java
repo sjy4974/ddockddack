@@ -56,24 +56,13 @@ public class BestcutService {
         String pinNumber = saveReq.getPinNumber();
         String socketId = saveReq.getSocketId();
 
-        for (BestcutImageReq imageReq : saveReq.getImages()) {
-            int index = imageReq.getBestcutIndex();
-
-            byte[] byteImage = gameRoomRepository.findByImageIndex(pinNumber, socketId, index);
+        for (int idx = 0; idx < saveReq.getImages().size(); idx++) {
+            int userImageIndex = saveReq.getImages().get(idx).getBestcutIndex();
+            byte[] byteImage = gameRoomRepository.findByImageIndex(pinNumber, socketId, userImageIndex);
             String fileName = awsS3.InputStreamUpload(byteImage);
 
-            Bestcut bestcut = Bestcut.builder()
-                .member(member)
-                .gameTitle(saveReq.getGameTitle())
-                .gameImageUrl(imageReq.getGameImgUrl())
-                .gameImgDesc(imageReq.getGameImgDesc())
-                .imageUrl(fileName)
-                .title(imageReq.getBestcutImgTitle())
-                .build();
-
+            Bestcut bestcut = saveReq.toEntity(member, idx, fileName);
             bestcutRepository.save(bestcut);
-
-
         }
     }
 
