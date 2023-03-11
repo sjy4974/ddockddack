@@ -20,4 +20,5 @@ public class GameRoomHistoryReq {
 
     @Column(nullable = false)
     private int ranking;
+
 }

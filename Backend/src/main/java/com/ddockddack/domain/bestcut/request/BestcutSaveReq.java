@@ -29,4 +29,5 @@ public class BestcutSaveReq {
     @Size(min = 1, max=10, message = "images must have at least 1 and less than 10 photos. ")
     @NotNull(message = "images can't be null")
     private List<BestcutImageReq> images;
+
 }

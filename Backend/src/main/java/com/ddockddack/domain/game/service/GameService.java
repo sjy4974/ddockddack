@@ -94,14 +94,7 @@ public class GameService {
                 new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
 
         // 게임 생성
-        Game game = Game
-                .builder()
-                .member(getMember)
-                .title(gameSaveReq.getGameTitle())
-                .category(gameSaveReq.getGameCategory())
-                .description(gameSaveReq.getGameDesc())
-                .build();
-
+        Game game = gameSaveReq.toEntity(getMember);
         Long gameId = gameRepository.save(game).getId();
 
         // 게임 이미지 업로드
@@ -120,11 +113,7 @@ public class GameService {
             // 파일 업로드
             String fileName = awsS3.multipartFileUpload(gameImageParam.getGameImage());
 
-            GameImage gameImage = GameImage.builder()
-                    .game(game)
-                    .imageUrl(fileName)
-                    .description(gameImageParam.getGameImageDesc())
-                    .build();
+            GameImage gameImage = gameImageParam.toEntity(game, fileName);
             // 리스트에 추가
             gameImages.add(gameImage);
 
@@ -146,14 +135,14 @@ public class GameService {
         // 검증
         checkAccessValidation(memberId, gameModifyReq.getGameId());
 
-        Game getGame = gameRepository.getReferenceById(gameModifyReq.getGameId());
+        Game getGame = gameRepository.findById(gameModifyReq.getGameId()).get();
 
         // 게임 제목, 설명 수정
         getGame.updateGame(gameModifyReq.getGameTitle(), gameModifyReq.getGameDesc());
 
         List<String> tempImage = new ArrayList<>();
         for (GameImageModifyReq gameImageModifyReq : gameModifyReq.getImages()) {
-            GameImage getGameImage = gameImageRepository.getReferenceById(gameImageModifyReq.getGameImageId());
+            GameImage getGameImage = gameImageRepository.findById(gameImageModifyReq.getGameImageId()).get();
 
             String imageExtension; // 이미지 확장자
             String contentType = gameImageModifyReq.getGameImage().getContentType();
@@ -203,8 +192,8 @@ public class GameService {
             throw new AlreadyExistResourceException(ErrorCode.ALREADY_EXIST_STTAREDGAME);
         }
 
-        Member getMember = memberRepository.getReferenceById(memberId);
-        Game getGame = gameRepository.getReferenceById(gameId);
+        Member getMember = memberRepository.findById(memberId).get();
+        Game getGame = gameRepository.findById(gameId).get();
 
         StarredGame starredGame = StarredGame.builder()
                 .game(getGame)
@@ -249,8 +238,8 @@ public class GameService {
             throw new AlreadyExistResourceException(ErrorCode.ALREADY_EXIST_REPORTEDGAME);
         }
 
-        Member reportMember = memberRepository.getReferenceById(memberId);
-        Game getGame = gameRepository.getReferenceById(gameId);
+        Member reportMember = memberRepository.findById(memberId).get();
+        Game getGame = gameRepository.findById(gameId).get();
 
         ReportedGame reportedGame = ReportedGame.builder()
                 .game(getGame)
