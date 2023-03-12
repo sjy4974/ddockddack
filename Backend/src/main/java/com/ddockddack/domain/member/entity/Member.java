@@ -6,12 +6,13 @@ import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import org.hibernate.annotations.DynamicInsert;
 
 @Entity
 @Getter @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(uniqueConstraints = { @UniqueConstraint(columnNames = { "email" })})
-// 이따가 테이블에 유니크 제약조건 추가
+@DynamicInsert
 public class Member extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,7 +42,6 @@ public class Member extends BaseEntity {
         this.nickname = nickname;
         this.profile = profile;
         this.role = role;
-        this.releaseDate = null;
     }
 
     public void modifyNickname(String nickname) {

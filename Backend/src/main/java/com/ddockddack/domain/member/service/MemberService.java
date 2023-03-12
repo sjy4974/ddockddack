@@ -10,6 +10,7 @@ import com.ddockddack.domain.member.entity.Member;
 import com.ddockddack.domain.member.entity.Role;
 import com.ddockddack.domain.member.repository.MemberRepository;
 import com.ddockddack.domain.member.request.MemberModifyNameReq;
+import com.ddockddack.domain.member.response.MemberInfoRes;
 import com.ddockddack.domain.report.repository.ReportedGameRepository;
 import com.ddockddack.global.aws.AwsS3;
 import com.ddockddack.global.error.ErrorCode;
@@ -55,12 +56,15 @@ public class MemberService {
         if (!member.getNickname().equals(modifyMemberNickname.getNickname())) {
             member.modifyNickname(modifyMemberNickname.getNickname());
         }
-//        return memberRepository.save(member);
     }
 
     @Transactional
     public String modifyMemberProfile(Long memberId, MultipartFile modifyProfileImg) {
         Member member = memberRepository.findById(memberId).get();
+
+        if (modifyProfileImg.isEmpty()) {
+            throw new NotFoundException(ErrorCode.MISSING_REQUIRED_VALUE);
+        }
 
         if (!(modifyProfileImg.getContentType().contains("image/jpg") ||
             (modifyProfileImg.getContentType().contains("image/jpeg") ||
@@ -88,8 +92,12 @@ public class MemberService {
      * @param memberId
      * @return member 정보
      */
-    public Optional<Member> getMemberById(Long memberId) {
-        return memberRepository.findById(memberId);
+    public MemberInfoRes memberDetails(Long memberId) {
+        Member member = memberRepository.findById(memberId).orElseThrow(() ->
+            new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
+
+        return MemberInfoRes.of(member.getId(), member.getEmail(), member.getNickname(),
+            member.getProfile(), member.getRole());
     }
 
     @Transactional
