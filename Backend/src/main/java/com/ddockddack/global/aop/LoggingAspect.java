@@ -19,7 +19,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 @Aspect
 @Slf4j
 public class LoggingAspect {
-    @Pointcut("execution(* com.ddockddack.domain.*(..))") // 이런 패턴이 실행될 경우 수행
+    @Pointcut("execution(* com.ddockddack.domain..*Controller.*(..))") // 이런 패턴이 실행될 경우 수행
     public void loggerPointCut() {
     }
 
